@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistem Deteksi APD Tenaga Medis menggunakan YOLOv11 - Upload foto, video, atau gunakan kamera realtime">
+    <title>Deteksi APD Nakes — Medical PPE Detection</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="grid-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🏥</div>
+            <div class="logo-text">
+                <h1>APD Nakes Detector</h1>
+                <span>YOLOv11 Medical PPE Detection System</span>
+            </div>
+        </div>
+        <div class="header-badge">
+            <span class="dot"></span>
+            Model Ready
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="tab-image" id="tabBtnImage">
+                <span class="tab-icon">📷</span>
+                Foto
+            </button>
+            <button class="tab-btn" data-tab="tab-video" id="tabBtnVideo">
+                <span class="tab-icon">🎥</span>
+                Video
+            </button>
+            <button class="tab-btn" data-tab="tab-camera" id="tabBtnCamera">
+                <span class="tab-icon">📹</span>
+                Kamera
+            </button>
+        </nav>
+
+        <!-- ======================== -->
+        <!-- TAB: IMAGE DETECTION     -->
+        <!-- ======================== -->
+        <section id="tab-image" class="tab-content active">
+            <div class="content-grid two-col">
+                <!-- Upload Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="icon">🖼️</span>
+                        Upload Foto
+                    </div>
+                    <div class="card-subtitle">Unggah gambar untuk mendeteksi APD tenaga medis</div>
+
+                    <div class="upload-zone" id="imageUploadZone">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Klik atau seret gambar ke sini</div>
+                        <div class="upload-hint">Format: JPG, PNG, WEBP — Maks 10MB</div>
+                        <input type="file" id="imageInput" accept="image/*">
+                    </div>
+
+                    <div class="file-info" id="imageFileInfo" style="display:none;"></div>
+
+                    <!-- Preview -->
+                    <div class="preview-container" id="imagePreview">
+                        <div class="preview-wrapper">
+                            <span class="preview-label">Preview</span>
+                            <img id="previewImage" src="" alt="Preview gambar">
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="detectImageBtn" disabled>
+                            🔍 Deteksi APD
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="icon">📊</span>
+                        Hasil Deteksi
+                    </div>
+                    <div class="card-subtitle">Hasil analisis APD akan muncul di sini</div>
+
+                    <div id="imageResultSection" class="result-section">
+                        <div class="preview-wrapper">
+                            <span class="preview-label">Hasil Deteksi</span>
+                            <img id="resultImage" src="" alt="Hasil deteksi">
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <div class="card-title" style="font-size:15px;">
+                                <span class="icon">📈</span> Statistik
+                            </div>
+                            <div class="stats-grid" id="imageStats" style="margin-top:12px;"></div>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <div class="card-title" style="font-size:15px;">
+                                <span class="icon">📋</span> Detail Deteksi
+                            </div>
+                            <div id="imageDetectionTable"></div>
+                        </div>
+                    </div>
+
+                    <div id="imageEmptyState" class="empty-state">
+                        <span class="empty-icon">🔬</span>
+                        <p>Upload dan deteksi gambar untuk melihat hasil</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================== -->
+        <!-- TAB: VIDEO DETECTION     -->
+        <!-- ======================== -->
+        <section id="tab-video" class="tab-content">
+            <div class="content-grid two-col">
+                <!-- Upload Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="icon">🎬</span>
+                        Upload Video
+                    </div>
+                    <div class="card-subtitle">Unggah video untuk mendeteksi APD pada setiap frame</div>
+
+                    <div class="upload-zone" id="videoUploadZone">
+                        <span class="upload-icon">📤</span>
+                        <div class="upload-text">Klik atau seret video ke sini</div>
+                        <div class="upload-hint">Format: MP4, AVI, MOV — Maks 100MB</div>
+                        <input type="file" id="videoInput" accept="video/*">
+                    </div>
+
+                    <div class="file-info" id="videoFileInfo" style="display:none;"></div>
+
+                    <div class="preview-container" id="videoPreview">
+                        <div class="preview-wrapper">
+                            <span class="preview-label">Preview</span>
+                            <video id="previewVideo" controls muted></video>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar-container" id="videoProgress">
+                        <div class="progress-bar" id="videoProgressBar"></div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="detectVideoBtn" disabled>
+                            🎬 Deteksi Video
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <span class="icon">📊</span>
+                        Hasil Deteksi Video
+                    </div>
+                    <div class="card-subtitle">Video hasil deteksi APD</div>
+
+                    <div id="videoResultSection" class="result-section">
+                        <div class="preview-wrapper">
+                            <span class="preview-label">Hasil</span>
+                            <video id="resultVideo" controls></video>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <div class="card-title" style="font-size:15px;">
+                                <span class="icon">📈</span> Statistik Total
+                            </div>
+                            <div class="stats-grid" id="videoStats" style="margin-top:12px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="videoEmptyState" class="empty-state">
+                        <span class="empty-icon">🎞️</span>
+                        <p>Upload dan deteksi video untuk melihat hasil</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================== -->
+        <!-- TAB: CAMERA REALTIME     -->
+        <!-- ======================== -->
+        <section id="tab-camera" class="tab-content">
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-title">
+                        <span class="icon">📹</span>
+                        Kamera Realtime
+                    </div>
+                    <div class="card-subtitle">Deteksi APD secara langsung menggunakan kamera / webcam</div>
+
+                    <div class="camera-container">
+                        <img class="camera-feed" id="cameraFeed" src="" alt="Camera Feed" style="display:none;">
+                        <div class="camera-placeholder" id="cameraPlaceholder">
+                            <span class="cam-icon">📹</span>
+                            <p>Tekan tombol "Mulai Kamera" untuk memulai</p>
+                        </div>
+                    </div>
+
+                    <div class="camera-status">
+                        <span class="status-dot" id="cameraStatusDot"></span>
+                        <span id="cameraStatusText">Kamera Tidak Aktif</span>
+                    </div>
+
+                    <div class="camera-controls">
+                        <button class="btn btn-primary" id="startCameraBtn">
+                            ▶️ Mulai Kamera
+                        </button>
+                        <button class="btn btn-danger" id="stopCameraBtn" style="display:none;">
+                            ⏹️ Hentikan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        © 2026 APD Nakes Detector — Powered by YOLOv11 &nbsp;|&nbsp; Medical PPE Detection System
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
